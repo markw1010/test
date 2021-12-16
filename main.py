@@ -46,8 +46,7 @@ def mainLoop():
         direction = buttonActions()
 
         number = len(snake) - 1
-        for i in range(1,
-                       len(snake)):  # iterate through the snake but with the starting point at the first body point directly behind the head of the snake
+        for i in range(1, len(snake)):  # iterate through the snake but with the starting point at the first body point directly behind the head of the snake
             snake[number] = snake[
                 number - 1].copy()  # body parts of the snake are moved by one element to the front to the place where the penultimate element was
             number -= 1

@@ -1,8 +1,10 @@
+import numpy as np
 import pygame
 import sys
 
 elementSize = 25
 snake = [[13,13],[13,14]]   # [13,13] is the head of the snake. [13,14] is the first body part of the snake
+appleCoordination = []
 direction = 0   # 0 = up, 1 = right, 2 = down, 3 = left
 
 green = (0, 255, 0)
@@ -10,23 +12,12 @@ lightGreen = (0, 102, 0)
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (180, 0, 0)
-grey = (47, 79, 79)
 
 pygame.init()
 clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode([700,700]) # 700 is the size of the gamefield
 
-
-"""
-This method will draw the snake (which consists of one block for the head and one block for the body in the beginning) 
-and the screen background on the monitor.
-
-At first, the screen background will be filled with black color. Then, a for loop will iterate through our snake (which 
-consists in the beginning of just one block for the head and one block for the body) and after analysing at what point 
-on the screen the snake is located (x-coordinate and y-coordinate, line 33) first the head of the snake will be drawn in 
-red color filled out and then the body will be drawn in the else part in green color but not filled out.
-"""
 def draw():
     screen.fill(black)
 
@@ -37,8 +28,24 @@ def draw():
             pygame.draw.rect(screen, red, (coordinate[0], coordinate[1], elementSize, elementSize),0) # rect is a square. (0,0,0) is the color black. coordinate[0] = x coordinate, coordinate[1] = y coordinate. elementSize = width and height of the square. 0 = square is filled out
             head = False
         else:
-            pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1)
+            pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1) # (47, 79, 79) is a grey color body
 
+# This method avoids that an apple can be generated on another apple or on any part of the snake
+def appleCoordinateGenerator():
+    notOK = True
+    while notOK:
+        coordinate = [np.random.randint(0, 28), np.random.randint(0, 28)]     # generates random numbers for the x and y coordinate from 0 to 27
+        change = False
+        for x in snake:
+            if coordinate == x:         # If coordinate is not ok, change will be True
+                change = True
+        for x in appleCoordination:     # to check if the apple is already spawn on a space with an apple
+            if coordinate == x:
+                change = True
+        if change == False:             # If coordinate is ok, the coordinate will be returned
+            return coordinate
+
+appleCoordination.append(appleCoordinateGenerator())        # one coordinate for the appleCoordination will be append
 
 # variables for Main Loop
 go = True   # The game runs as long as the go variable is True
@@ -60,6 +67,7 @@ def mainLoop():
 
         startEndGame()
 
+
 def startEndGame():
     if end == False:  # check for collision with a wall or the snake itself
         draw()
@@ -68,6 +76,7 @@ def startEndGame():
         print("You achieved " + str(score) + " points")
         sys.exit()
     clock.tick(10)
+
 
 def snakeNavigation(direction):
     if direction == 0:  # if direction = 0 (up) then the y coordinate of the head should be decreased by one
@@ -78,6 +87,7 @@ def snakeNavigation(direction):
         snake[0][1] += 1
     if direction == 3:  # if direction = 3 (left) then the x coordinate of the head should be decreased by one
         snake[0][0] -= 1
+
 
 def buttonActions():
     for event in pygame.event.get():  # all the reactions to the different types of events like button presses are defined in the for loop
