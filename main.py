@@ -17,10 +17,17 @@ clock = pygame.time.Clock()
 font = pygame.font.SysFont('arialblack', 35)
 screen = pygame.display.set_mode([700,700]) # 700 is the size of the gamefield
 
+"""
+This method generates the textfield on the top of the playground, which shows the score of the game.
+"""
 def textObject(text, font):
     textArea = font.render(text, True, (255, 255, 255))
     return textArea, textArea.get_rect()
 
+
+"""
+This method draws the the snake and the apples (white boxes) on the playground and fills the background in black color.
+"""
 def draw():
     screen.fill(black)
     drawApple()
@@ -38,10 +45,17 @@ def drawSnake():
             pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1)  # (47, 79, 79) is a grey color body
 
 
+"""
+This method draws the apples on the playground. The coordination for the apple spawn can be interpreted as follows: 
+apple[0] = x coordinate. apple[1] = y coordinate. Therefore, the coordination[0] is the first element in the 
+coordination array and represents the x-coordinate of the apple spawn. The coordination[1] is the second element in the 
+coordination array and represents the y-coordinate of the apple spawn. The 1 at the end of the pygame.draw.rect 
+method makes, that the white boxes are only outlined but not filled out.
+"""
 def drawApple():
     for apple in appleCoordination:
-        coordination = [apple[0] * elementSize, apple[1] * elementSize]  # The coordinates for the apple spawn. apple[0] = x coordinate. apple[1] = y coordinate.
-        pygame.draw.rect(screen, white, (coordination[0], coordination[1], elementSize, elementSize), 1)  # spawn the apple
+        coordination = [apple[0] * elementSize, apple[1] * elementSize]
+        pygame.draw.rect(screen, white, (coordination[0], coordination[1], elementSize, elementSize), 1)
 
 
 # This method avoids that an apple can be generated on another apple or on any part of the snake
@@ -71,25 +85,19 @@ def mainLoop():
 
     while go:
         direction = buttonActions(direction)
-
-        if snakeAttachment != None:
-            snake.append(snakeAttachment.copy())
-            snakeAttachment = None
-            appleCoordination.pop(appleIndex)       # apple will be deleted from the apple list
-
         snakeMovement()
-
         snakeDirections(direction)
-
         end = snakeCollusion(end)
-
         appleIndex, score, snakeAttachment = bodyIncreasing(appleIndex, score, snakeAttachment)
-
+        snakeAttachment = snakeAttachementProof(appleIndex, snakeAttachment)
         appleFrequency()
-
         startEndGame(end, score)
 
 
+"""
+This method checks for collision with a wall or the snake itself. If so, the game will be ended with the achieved score 
+printed on the console. If not, the playground will be showed.
+"""
 def startEndGame(end, score):
     if end == False:  # check for collision with a wall or the snake itself
         showPlayground(score)
@@ -99,24 +107,35 @@ def startEndGame(end, score):
     clock.tick(10)
 
 
+"""
+This method draws the snake, the apples appearing on the playground and the text box that counts the score at the top of
+the playground. The pygame.display.update() method will print all the changes of the screen
+"""
 def showPlayground(score):
     draw()
     textGround, textBox = textObject("Score: " + str(score), font)
     textBox.center = ((350, 40))
     screen.blit(textGround, textBox)
-    pygame.display.update()  # changes of the screen will be printed
+    pygame.display.update()
 
 
+"""
+This method defines the amount and the frequency of the apples that are shown on the playground. There is a minimum of
+one apple that has to be on the playground and a maximum of four apples that can be on the playground. 
+len(appleCoordination) == 0 means that if there is no apple on the field one has to be spwaned!
+"""
 def appleFrequency():
     random = np.random.randint(0, 100)
-    if random <= 1 and len(appleCoordination) < 4 or len(
-            appleCoordination) == 0:  # random <= 1 equals a 2% probability. if there are already four apples on the field. len(appleCoordination) == 0 means that if there is no apple on the field one has to be spwaned!
-        appleCoordination.append(appleCoordinateGenerator())  # apple will be created
+    if random <= 1 and len(appleCoordination) < 4 or len(appleCoordination) == 0:
+        appleCoordination.append(appleCoordinateGenerator())
 
 
+"""
+This method checks, if the apple coordination is the same as the snake head coordination, then the body of the snake 
+will be increased by one and the score will be increased by one as well.
+"""
 def bodyIncreasing(appleIndex, score, snakeAttachment):
-    for x in range(0,
-                   len(appleCoordination)):  # if the apple coordination = snake head coordination, then the body of the snake will be increased by one and the score will be increased by one as well
+    for x in range(0, len(appleCoordination)):
         if appleCoordination[x] == snake[0]:
             snakeAttachment = snake[-1].copy()
             appleIndex = x  # apple index will be destroyed (?)
@@ -124,15 +143,33 @@ def bodyIncreasing(appleIndex, score, snakeAttachment):
     return appleIndex, score, snakeAttachment
 
 
+"""
+This method is highly connected to the bodyIncreasing method. It checks if there is a attachment of the snake and if so, 
+a copy of it will be attached to the rest of the snake (which consist of one body block and one head block).
+"""
+def snakeAttachementProof(appleIndex, snakeAttachment):
+    if snakeAttachment != None:
+        snake.append(snakeAttachment.copy())
+        snakeAttachment = None
+        appleCoordination.pop(appleIndex)  # apple will be deleted from the apple list
+    return snakeAttachment
+
+
+"""
+This method checks, if the snake is collided either with itself or with one of the four boundaries. Therefore the 
+method checks:
+
+if the head of the snake has the same position with one of the body parts of the snake
+if the x-coordinate of the snake is on the left (0) or on the right (27) side out of the playground
+if the snake y-coordinate of the snake is on the upper (0) or on the lower (27) side out of the playground
+"""
 def snakeCollusion(end):
     for x in range(1, len(snake)):
-        if snake[0] == snake[x]:  # this line checks, if one bodypart of the snake collidate with the head of the snake
+        if snake[0] == snake[x]:
             end = True
-    if snake[0][0] < 0 or snake[0][
-        0] > 27:  # checks if the snake x-coordinate of the snake is on the left (0) or on the right (27) side out of the playground
+    if snake[0][0] < 0 or snake[0][0] > 27:
         end = True
-    if snake[0][1] < 0 or snake[0][
-        1] > 27:  # checks if the snake y-coordinate of the snake is on the upper (0) or on the lower (27) side out of the playground
+    if snake[0][1] < 0 or snake[0][1] > 27:
         end = True
     return end
 
@@ -189,16 +226,16 @@ K_a with K_LEFT
 def buttonActions(direction):
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
-        if event.type == pygame.KEYDOWN:  #
-            if event.key == pygame.K_w and direction != 2:  # K_UP
-                direction = 0  # If direction is not up, the snake can be moved up (direction 0)
-            if event.key == pygame.K_d and direction != 3:  # alternative: K_RIGHT
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w and direction != 2:
+                direction = 0
+            if event.key == pygame.K_d and direction != 3:
                 direction = 1
-            if event.key == pygame.K_s and direction != 0:  # alternative: K_DOWN
+            if event.key == pygame.K_s and direction != 0:
                 direction = 2
-            if event.key == pygame.K_a and direction != 1:  # alternative: K_LEFT
+            if event.key == pygame.K_a and direction != 1:
                 direction = 3
     return direction
 
-
+# To start the program, the main loop has to be called!
 mainLoop()
