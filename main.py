@@ -6,7 +6,7 @@ elementSize = 25
 snake = [[13,13],[13,14]]   # [13,13] is the head of the snake. [13,14] is the first body part of the snake
 appleCoordination = []
 
-green = (0, 255, 0)
+green = (0, 255, 0)     # RGB value
 lightGreen = (0, 102, 0)
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -34,44 +34,33 @@ def draw():
     drawSnake()
 
 
+"""
+This method draws the snake on the playground. The coordination for the head spawn can be interpreted as follows: 
+coordinate[0] = x-coordinates for the snake bodypart. coordinate[1] = y-coordinates for the snake bodypart. The 1 at the 
+end of the pygame.draw.rect method makes, that the white boxes are only outlined but not filled out.
+"""
 def drawSnake():
     head = True
-    for x in snake:
-        coordinate = [x[0] * elementSize, x[1] * elementSize]  # To identify at which point on the screen the head of the snake is. x[0] represents the x coordinate and equals 13 whereas x[1] represents the y coordinate and equals 14
+    for bodypart in snake:
+        coordinate = [bodypart[0] * elementSize, bodypart[1] * elementSize]  # To identify at which point on the screen the head of the snake is. x[0] represents the x coordinate and equals 13 whereas x[1] represents the y coordinate and equals 14
         if head:
             pygame.draw.rect(screen, red, (coordinate[0], coordinate[1], elementSize, elementSize), 0)  # rect is a square. (0,0,0) is the color black. coordinate[0] = x coordinate, coordinate[1] = y coordinate. (left, top, width, height). 0 = square is filled out
             head = False
         else:
-            pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1)  # (47, 79, 79) is a grey color body
+            pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1)
 
 
 """
 This method draws the apples on the playground. The coordination for the apple spawn can be interpreted as follows: 
-apple[0] = x coordinate. apple[1] = y coordinate. Therefore, the coordination[0] is the first element in the 
-coordination array and represents the x-coordinate of the apple spawn. The coordination[1] is the second element in the 
-coordination array and represents the y-coordinate of the apple spawn. The 1 at the end of the pygame.draw.rect 
-method makes, that the white boxes are only outlined but not filled out.
+apple[0] = x-coordinate. apple[1] = y-coordinate. Therefore, the coordination[0] is the first element in the nested 
+array and represents the x-coordinate of the apple spawn. The coordination[1] is the second element in the nested array 
+and represents the y-coordinate of the apple spawn. The 1 at the end of the pygame.draw.rect method makes, that the 
+white boxes are only outlined but not filled out.
 """
 def drawApple():
     for apple in appleCoordination:
         coordination = [apple[0] * elementSize, apple[1] * elementSize]
         pygame.draw.rect(screen, white, (coordination[0], coordination[1], elementSize, elementSize), 1)
-
-
-# This method avoids that an apple can be generated on another apple or on any part of the snake
-def appleCoordinateGenerator():
-    notOK = True
-    while notOK:
-        coordinate = [np.random.randint(0, 28), np.random.randint(0, 28)]     # generates random numbers for the x and y coordinate from 0 to 27
-        change = False
-        for x in snake:
-            if coordinate == x:         # If coordinate is not ok, change will be True
-                change = True
-        for x in appleCoordination:     # to check if the apple is already spawn on a space with an apple
-            if coordinate == x:
-                change = True
-        if change == False:             # If coordinate is ok, the coordinate will be returned
-            return coordinate
 
 
 def mainLoop():
@@ -104,7 +93,7 @@ def startEndGame(end, score):
     else:
         print("You achieved " + str(score) + " points")
         sys.exit()
-    clock.tick(10)
+    clock.tick(0.5)
 
 
 """
@@ -113,16 +102,32 @@ the playground. The pygame.display.update() method will print all the changes of
 """
 def showPlayground(score):
     draw()
-    textGround, textBox = textObject("Score: " + str(score), font)
-    textBox.center = ((350, 40))
-    screen.blit(textGround, textBox)
+    #textGround, textBox = textObject("Score: " + str(score), font)
+    #textBox.center = ((350, 40))
+    #screen.blit(textGround, textBox)
     pygame.display.update()
+
+
+# This method avoids that an apple can be generated on another apple or on any part of the snake
+def appleCoordinateGenerator():
+    notOK = True
+    while notOK:
+        coordinate = [np.random.randint(0, 28), np.random.randint(0, 28)]     # generates random numbers for the x and y coordinate from 0 to 27
+        change = False
+        for x in snake:
+            if coordinate == x:         # If coordinate is not ok, change will be True
+                change = True
+        for x in appleCoordination:     # to check if the apple is already spawn on a space with an apple
+            if coordinate == x:
+                change = True
+        if change == False:             # If coordinate is ok, the coordinate will be returned
+            return coordinate
 
 
 """
 This method defines the amount and the frequency of the apples that are shown on the playground. There is a minimum of
 one apple that has to be on the playground and a maximum of four apples that can be on the playground. 
-len(appleCoordination) == 0 means that if there is no apple on the field one has to be spwaned!
+len(appleCoordination) == 0 means that if there is no apple on the field one has to be spawned!
 """
 def appleFrequency():
     random = np.random.randint(0, 100)
