@@ -2,8 +2,8 @@ import pygame
 import sys
 import numpy as np
 
-elementSize = 25
-snake = [[13,13],[13,14]]   # [13,13] is the head of the snake. [13,14] is the first body part of the snake
+#elementSize = 25
+snake = [[325,325],[325,350]]   # [13,13] is the head of the snake. [13,14] is the first body part of the snake
 appleCoordination = []
 
 green = (0, 255, 0)     # RGB value
@@ -42,12 +42,12 @@ end of the pygame.draw.rect method makes, that the white boxes are only outlined
 def drawSnake():
     head = True
     for bodypart in snake:
-        coordinate = [bodypart[0] * elementSize, bodypart[1] * elementSize]
+        #coordinate = [bodypart[0] * elementSize, bodypart[1] * elementSize]  # To identify at which point on the screen the head of the snake is. x[0] represents the x coordinate and equals 13 whereas x[1] represents the y coordinate and equals 14
         if head:
-            pygame.draw.rect(screen, red, (coordinate[0], coordinate[1], elementSize, elementSize), 0)
+            pygame.draw.rect(screen, red, (bodypart[0], bodypart[1], 1, 1), 0)  # rect is a square. (0,0,0) is the color black. coordinate[0] = x coordinate, coordinate[1] = y coordinate. (left, top, width, height). 0 = square is filled out
             head = False
         else:
-            pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1)
+            pygame.draw.rect(screen, green, (bodypart[0], bodypart[1], 1, 1), 1)
 
 
 """
@@ -59,15 +59,13 @@ white boxes are only outlined but not filled out.
 """
 def drawApple():
     for apple in appleCoordination:
-        coordination = [apple[0] * elementSize, apple[1] * elementSize]
-        pygame.draw.rect(screen, white, (coordination[0], coordination[1], elementSize, elementSize), 1)
+        #coordination = [apple[0] * elementSize, apple[1] * elementSize]
+        pygame.draw.rect(screen, white, (apple[0], apple[1], 1, 1), 1)
 
 
-"""
-This is the main loop of the game and it keeps the game running as long as the go variable is True.
-"""
 def mainLoop():
-    go = True
+    # Main Loop
+    go = True  # The game runs as long as the go variable is True
     snakeAttachment = None
     appleIndex = -1  # ???
     end = False
@@ -95,7 +93,7 @@ def startEndGame(end, score):
     else:
         print("You achieved " + str(score) + " points")
         sys.exit()
-    clock.tick(10)
+    clock.tick(0.5)
 
 
 """
@@ -104,30 +102,25 @@ the playground. The pygame.display.update() method will print all the changes of
 """
 def showPlayground(score):
     draw()
-    textGround, textBox = textObject("Score: " + str(score), font)
-    textBox.center = ((350, 40))
-    screen.blit(textGround, textBox)
+    #textGround, textBox = textObject("Score: " + str(score), font)
+    #textBox.center = ((350, 40))
+    #screen.blit(textGround, textBox)
     pygame.display.update()
 
 
-"""
-This method generates coordinates of the apples to spawn on the gamefield. Therefore, random numbers from 0 to 27 are 
-generated for the x- and y-coordinate of the apples. This method avoids that an apple can be generated on another apple 
-or on any part of the snake by checking the coordinates of the apple and possible collisions. If coordinate is ok, means
-that there are no collisions, the coordinate will be returned
-"""
+# This method avoids that an apple can be generated on another apple or on any part of the snake
 def appleCoordinateGenerator():
     notOK = True
     while notOK:
-        coordinate = [np.random.randint(0, 28), np.random.randint(0, 28)]
+        coordinate = [np.random.randint(0, 28), np.random.randint(0, 28)]     # generates random numbers for the x and y coordinate from 0 to 27
         change = False
         for x in snake:
+            if coordinate == x:         # If coordinate is not ok, change will be True
+                change = True
+        for x in appleCoordination:     # to check if the apple is already spawn on a space with an apple
             if coordinate == x:
                 change = True
-        for x in appleCoordination:
-            if coordinate == x:
-                change = True
-        if change == False:
+        if change == False:             # If coordinate is ok, the coordinate will be returned
             return coordinate
 
 
