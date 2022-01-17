@@ -249,11 +249,6 @@ def buttonActions(direction):
                 direction = 3
     return direction
 
-
-def changeName(name):
-    name += " jo"
-    print(name)
-
 # To start the program, the main loop has to be called!
 mainLoop()
 
