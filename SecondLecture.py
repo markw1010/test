@@ -1,94 +1,37 @@
 import pygame
-import sys
 
 elementSize = 25
 snake = [[13,13],[13,14]]   # [13,13] is the head of the snake. [13,14] is the first body part of the snake
-direction = 0   # 0 = up, 1 = right, 2 = down, 3 = left
 
-green = (0, 255, 0)
+green = (0, 255, 0)     # RGB value
 lightGreen = (0, 102, 0)
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (180, 0, 0)
-grey = (47, 79, 79)
 
 pygame.init()
-clock = pygame.time.Clock()
-
 screen = pygame.display.set_mode([700,700]) # 700 is the size of the gamefield
 
 
 """
-This method will draw the snake (which consists of one block for the head and one block for the body in the beginning) 
-and the screen background on the monitor.
-
-At first, the screen background will be filled with black color. Then, a for loop will iterate through our snake (which 
-consists in the beginning of just one block for the head and one block for the body) and after analysing at what point 
-on the screen the snake is located (x-coordinate and y-coordinate, line 33) first the head of the snake will be drawn in 
-red color filled out and then the body will be drawn in the else part in green color but not filled out.
+This method draws the snake and the apples (white boxes) on the playground and fills the background in black color.
 """
 def draw():
     screen.fill(black)
+    drawSnake()
 
+
+"""
+This method draws the snake on the playground. The coordination for the head spawn can be interpreted as follows: 
+coordinate[0] = x-coordinates for the snake bodypart. coordinate[1] = y-coordinates for the snake bodypart. The 1 at the 
+end of the pygame.draw.rect method makes, that the white boxes are only outlined but not filled out.
+"""
+def drawSnake():
     head = True
-    for x in snake:
-        coordinate = [x[0] * elementSize, x[1] * elementSize] # To identify at which point on the screen the head of the snake is. x[0] represents the x coordinate and equals 13 whereas x[1] represents the y coordinate and equals 14
+    for bodypart in snake:
+        coordinate = [bodypart[0] * elementSize, bodypart[1] * elementSize]
         if head:
-            pygame.draw.rect(screen, red, (coordinate[0], coordinate[1], elementSize, elementSize),0) # rect is a square. (0,0,0) is the color black. coordinate[0] = x coordinate, coordinate[1] = y coordinate. elementSize = width and height of the square. 0 = square is filled out
+            pygame.draw.rect(screen, red, (coordinate[0], coordinate[1], elementSize, elementSize), 0)
             head = False
         else:
             pygame.draw.rect(screen, green, (coordinate[0], coordinate[1], elementSize, elementSize), 1)
-
-
-# variables for Main Loop
-go = True   # The game runs as long as the go variable is True
-snakeAttachment = None
-appleIndex = -1     #???
-end = False
-score = 0
-
-def mainLoop():
-    while go:
-        direction = buttonActions()
-
-        number = len(snake) - 1
-        for i in range(1, len(snake)):                  # iterate through the snake but with the starting point at the first body point directly behind the head of the snake
-            snake[number] = snake[number - 1].copy()    # body parts of the snake are moved by one element to the front to the place where the penultimate element was
-            number -= 1
-
-        snakeNavigation(direction)
-
-        startEndGame()
-
-def startEndGame():
-    if end == False:  # check for collision with a wall or the snake itself
-        draw()
-        pygame.display.update()  # changes of the screen will be printed
-    else:
-        print("You achieved " + str(score) + " points")
-        sys.exit()
-    clock.tick(10)
-
-def snakeNavigation(direction):
-    if direction == 0:  # if direction = 0 (up) then the y coordinate of the head should be decreased by one
-        snake[0][1] -= 1
-    if direction == 1:  # if direction = 1 (right) then the x coordinate of the head should be increased by one
-        snake[0][0] += 1
-    if direction == 2:  # if direction = 2 (down) then the y coordinate of the head should be increased by one
-        snake[0][1] += 1
-    if direction == 3:  # if direction = 3 (left) then the x coordinate of the head should be decreased by one
-        snake[0][0] -= 1
-
-def buttonActions():
-    for event in pygame.event.get():  # all the reactions to the different types of events like button presses are defined in the for loop
-        if event.type == pygame.QUIT: sys.exit()  # If the game window gets close, the game will be closed
-        if event.type == pygame.KEYDOWN:  # Asks if any button is pushed      the following if cases will only allow to move the snake in a certain direkction, if it is not moving in the opposite direction at the moment
-            if event.key == pygame.K_w and direction != 2:  # K_UP it is forbidden to move the snake upwards if it is moving downwards. It first have to move left or right
-                direction = 0  # If direction is not down, the snake can be moved up (direction 0)
-            if event.key == pygame.K_d and direction != 3:  # K_RIGHT       If direction is not left, the snake can be moved right (direction 1)
-                direction = 1
-            if event.key == pygame.K_s and direction != 0:  # K_DOWN       If direction is not up, the snake can be moved down (direction 2)
-                direction = 2
-            if event.key == pygame.K_a and direction != 1:  # K_LEFT       If direction is not right, the snake can be moved left (direction 3)
-                direction = 3
-    return direction

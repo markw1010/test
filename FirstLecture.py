@@ -14,7 +14,7 @@ screen = pygame.display.set_mode([700,700]) # 700 is the size of the gamefield
 
 
 """
-This method draws the the snake and the apples (white boxes) on the playground and fills the background in black color.
+This method draws the snake and the apples (white boxes) on the playground and fills the background in black color.
 """
 def draw():
     screen.fill(black)
