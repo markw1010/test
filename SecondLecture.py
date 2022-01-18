@@ -22,6 +22,7 @@ This method draws the snake and the apples (white boxes) on the playground and f
 def draw():
     screen.fill(black)
     drawSnake()
+    #TODO drawApple()
 
 
 """
@@ -52,13 +53,13 @@ def mainLoop():
 
     while go:
         direction = buttonActions(direction)
-        snakeMovement()
-        snakeDirections(direction)
+        #snakeMovement()
+        #snakeDirections(direction)
         #end = snakeCollusion(end)
         #appleIndex, score, snakeAttachment = bodyIncreasing(appleIndex, score, snakeAttachment)
         #snakeAttachment = snakeAttachementProof(appleIndex, snakeAttachment)
         #appleFrequency()
-        #startEndGame(end, score)
+        startEndGame(end, score)
 
 """
 This method defines all the actions that will happen after certain button presses. Therefore the pygame.event.get() 
@@ -91,38 +92,6 @@ def buttonActions(direction):
             if event.key == pygame.K_a and direction != 1:
                 direction = 3
     return direction
-
-
-"""
-This method defines the movement of the body parts of the snake by iterating through the snake with the starting 
-point at the first body block directly behind the head of the snake. Within the iteration, the body parts of the snake 
-are moved by one element to the front to the place where the penultimate element was. A copy of the snake list has to be 
-created, because otherwise both lists would change if one is changed
-"""
-def snakeMovement():
-    number = len(snake) - 1
-    for i in range(1, len(snake)):
-        snake[number] = snake[number - 1].copy()
-        number -= 1
-
-
-"""
-This method defines, in what directions the snake should move given certain directions.
-
-if direction = 0 (up) then the y coordinate of the head should be decreased by one
-if direction = 1 (right) then the x coordinate of the head should be increased by one
-if direction = 2 (down) then the y coordinate of the head should be increased by one
-if direction = 3 (left) then the x coordinate of the head should be decreased by one
-"""
-def snakeDirections(direction):
-    if direction == 0:
-        snake[0][1] -= 1
-    if direction == 1:
-        snake[0][0] += 1
-    if direction == 2:
-        snake[0][1] += 1
-    if direction == 3:
-        snake[0][0] -= 1
 
 
 """
